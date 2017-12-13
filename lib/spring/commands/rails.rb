@@ -9,6 +9,11 @@ module Spring
       def description
         nil
       end
+
+      def environment_regex
+        /--environment=(\w+)/
+      end
+
     end
 
     class RailsConsole < Rails
@@ -18,9 +23,9 @@ module Spring
         environment = nil
 
         args.each.with_index do |arg, i|
-          if arg =~ /--environment=(\w+)/
+          if arg =~ environment_regex
             environment = $1
-          elsif i > 0 && args[i - 1] == "-e"
+          elsif i > 0 && (args[i - 1] == "-e" || args[i - 1] == "--environment")
             environment = arg
           end
         end
@@ -66,11 +71,11 @@ module Spring
           case arg
           when "-e"
             false
-          when /--environment=(\w+)/
+          when environment_regex
             environment = $1
             false
           else
-            if i > 0 && args[i - 1] == "-e"
+            if i > 0 && (args[i - 1] == "-e" || args[i - 1] == "--environment")
               environment = arg
               false
             else
@@ -88,9 +93,9 @@ module Spring
         environment = "test"
 
         args.each.with_index do |arg, i|
-          if arg =~ /--environment=(\w+)/
+          if arg =~ environment_regex
             environment = $1
-          elsif i > 0 && args[i - 1] == "-e"
+          elsif i > 0 && (args[i - 1] == "-e" || args[i - 1] == "--environment")
             environment = arg
           end
         end
